@@ -1,5 +1,7 @@
 FROM pytorch/pytorch:2.2.2-cuda12.1-cudnn8-runtime
 
+ENV YOLO_AUTOINSTALL=False
+
 WORKDIR /app
 
 RUN python -m pip install --no-cache-dir --upgrade pip setuptools wheel

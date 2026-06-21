@@ -1,16 +1,33 @@
 FROM pytorch/pytorch:2.2.2-cuda12.1-cudnn8-runtime
 
-ENV YOLO_AUTOINSTALL=False
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    YOLO_AUTOINSTALL=False
 
 WORKDIR /app
 
-RUN python -m pip install --no-cache-dir --upgrade pip setuptools wheel
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    curl \
+    ca-certificates \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender1 \
+    libgl1 \
+    libjpeg-turbo8 \
+    libpng16-16 \
+    libtiff6 \
+    libopenjp2-7 \
+    libheif1 \
+ && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt .
-RUN python -m pip install --no-cache-dir -r requirements.txt \
-    --extra-index-url https://download.pytorch.org/whl/cu121 \
-    && python -m pip uninstall -y opencv-python || true \
-    && python -m pip install --no-cache-dir --force-reinstall opencv-python-headless==4.10.0.84
+COPY requirements.txt /app/requirements.txt
+RUN python -m pip install --upgrade pip setuptools wheel \
+ && python -m pip install -r /app/requirements.txt \
+    --extra-index-url https://download.pytorch.org/whl/cu121
 
 # Verificaciones fail-fast
 RUN python -c "import numpy as np; print('numpy ok', np.__version__)"
@@ -20,6 +37,6 @@ RUN python -c "from ultralytics import YOLO; print('ultralytics ok')"
 # Precarga modelo
 RUN python -c "from ultralytics import YOLO; YOLO('yolo11n.pt')"
 
-COPY handler.py .
+COPY . /app
 
-CMD ["python", "-u", "handler.py"]
+CMD ["python", "-u", "/app/handler.py"]

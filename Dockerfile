@@ -19,15 +19,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgl1 \
     libjpeg-turbo8 \
     libpng16-16 \
-    libtiff6 \
+    libtiff5 \
     libopenjp2-7 \
     libheif1 \
  && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt /app/requirements.txt
 RUN python -m pip install --upgrade pip setuptools wheel \
- && python -m pip install -r /app/requirements.txt \
-    --extra-index-url https://download.pytorch.org/whl/cu121
+ && python -m pip install -r /app/requirements.txt
 
 # Verificaciones fail-fast
 RUN python -c "import numpy as np; print('numpy ok', np.__version__)"

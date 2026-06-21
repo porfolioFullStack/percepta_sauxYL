@@ -5,9 +5,9 @@ WORKDIR /app
 RUN python -m pip install --no-cache-dir --upgrade pip setuptools wheel
 
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt \
+RUN python -m pip install --no-cache-dir -r requirements.txt \
     && pip uninstall -y opencv-python \
-    && pip install --no-cache-dir --force-reinstall opencv-python-headless==4.10.0.84
+    && python -m pip install --no-cache-dir --force-reinstall opencv-python-headless==4.10.0.84
 
 # Verificaciones fail-fast: si algo falla, el build explota acá (no en runtime)
 RUN python -c "import numpy as np; print('numpy ok', np.__version__)"

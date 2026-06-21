@@ -1,3 +1,4 @@
 runpod
+opencv-python-headless
 ultralytics
 pillow

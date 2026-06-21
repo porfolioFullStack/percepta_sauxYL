@@ -5,7 +5,9 @@ WORKDIR /app
 RUN python -m pip install --no-cache-dir --upgrade pip
 
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt \
+    && pip uninstall -y opencv-python \
+    && pip install --no-cache-dir opencv-python-headless
 
 # Precarga yolo11n.pt en el build para evitar descarga en cold start
 RUN python -c "from ultralytics import YOLO; YOLO('yolo11n.pt')"

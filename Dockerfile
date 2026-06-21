@@ -8,15 +8,16 @@ RUN python -m pip install --no-cache-dir --upgrade pip setuptools wheel
 
 COPY requirements.txt .
 RUN python -m pip install --no-cache-dir -r requirements.txt \
-    && pip uninstall -y opencv-python \
+    --extra-index-url https://download.pytorch.org/whl/cu121 \
+    && python -m pip uninstall -y opencv-python || true \
     && python -m pip install --no-cache-dir --force-reinstall opencv-python-headless==4.10.0.84
 
-# Verificaciones fail-fast: si algo falla, el build explota acá (no en runtime)
+# Verificaciones fail-fast
 RUN python -c "import numpy as np; print('numpy ok', np.__version__)"
-RUN python -c "import torch; print('torch ok', torch.__version__)"
+RUN python -c "import torch; print('torch ok', torch.__version__, '| cuda:', torch.cuda.is_available())"
 RUN python -c "from ultralytics import YOLO; print('ultralytics ok')"
 
-# Precarga yolo11n.pt en el build para evitar descarga en cold start
+# Precarga modelo
 RUN python -c "from ultralytics import YOLO; YOLO('yolo11n.pt')"
 
 COPY handler.py .
